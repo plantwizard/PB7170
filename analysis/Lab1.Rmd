@@ -1,0 +1,19 @@
+---
+title: "Lab1"
+site: 
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Simulation}
+s=rnorm(1000,15,10)
+hist(s)
+```
+
