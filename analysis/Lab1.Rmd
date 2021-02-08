@@ -1,6 +1,6 @@
 ---
 title: "Lab1"
-site: 
+site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
     toc: false
