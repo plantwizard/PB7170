@@ -1,0 +1,234 @@
+---
+title: "Reproducible scripting, AlphaSimR, Homework"
+author: 
+  name: "Jean-Luc Jannink"
+  affiliation: "USDA-ARS / Cornell"
+date: "February 9, 2021"
+output:
+  html_document:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 12
+    highlight: haddock
+    theme: cosmo
+    toc: yes
+    toc_float:
+      collapsed: no
+      toc_depth: 2
+editor_options: 
+  chunk_output_type: console
+---
+  
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+knitr::opts_chunk$set(message=FALSE)
+knitr::opts_chunk$set(cache=FALSE)
+```
+
+# Preliminaries
+
+### Learning objectives
+1. A bit more on reproducible scripting  
+Some other things that matter to me to ensure communicability and reproducibility
+  i) The main README.md file should contain information about the conditions under-which the script was run  
+  ii) I like the script to have a predictable strucure: load and document the packages used, if there is a stochastic component, set the random seed, set and document the parameter values that will affect the script output  
+  iii) Use a consistent directory structure. Happily, such a consistent structure is enforced by `workflowr`  
+  iv) Use the package `here` to make file locations relative to the base project folder  
+
+2. AlphaSimR  
+`AlphaSimR` is a package to simulate breeding populations and tasks. It is not completely intuitive nor completely well-documented. We will want to use it ultimately to optimize breeding schemes. Hopefully, we will be able to contrast it's output with the output of deterministic analytic optimization  
+
+3. Prepare a Homework  
+In class, we have discussed two interesting phenomena related to quantitative traits:  
+  i) The "outbreak of variation" that occurs when a heterozygous individual is self-fertilized  
+  ii) Regression toward the mean between parents and progeny  
+This Rmarkdown script contains code to illustrate the former. Your homework will be to write a script that illustrates the latter  
+
+# Ordering of the script  
+It's good to have all scripts in the same order with respect to standard tasks  
+
+### Load packages first  
+If your script depends on external packages, load them at the beginning. This shows users early on what the script dependencies are.  
+```{r load packages, message=TRUE}
+packages_used <- c("AlphaSimR", "tidyverse", "workflowr", "here")
+ip <- installed.packages()
+for (package in packages_used){
+  if (!(package %in% ip[,"Package"])) install.packages(package)
+}#END packages_used
+```
+
+Notice the conflicts report from loading tidyverse.  Two packages (`dplyr` and `stats`) both have a function called `filter`. Since dplyr was loaded *after* stats, if you use the function `filter`, it will go to the dplyr version.  It is dangerous to rely on what order packages have been loaded to determine which `filter` function you get.  R syntax to prevent ambiguity is to write either `dplyr::filter` or `stats::filter`.  Using that syntax will make your code more reproducible.  
+
+### Set file locations relative to the project folder using `here`  
+```{r set here path}
+here::i_am("analysis/Lab2_ProgrammingAlphaSimR.Rmd")
+```
+
+### Document packages used  
+This chunk creates a "README.md" file that documents the packages and versions used for future reference.  
+```{r document packages}
+source(here::here("code/addToREADME.R"))
+addToREADME(paste0("## ", rmarkdown::metadata$title), append=F)
+addToREADME(c(date(), ""))
+
+packages_info <- ip[packages_used, c("Package", "Version", "Built")]
+addToREADME(c("The packages used in this script are:", "Package, Version, Built"))
+apply(packages_info, 1, function(vec) addToREADME(paste(vec, collapse=" ")))
+addToREADME("")
+```
+Hyperlink the [README file](README.md) to the report.  That makes it easy to find.  
+
+### Set random seed  
+AlphaSimR generates many random numbers (e.g., to simulate Mendelian random segregation).  If you want the result of the analysis to come out the same each time (there are pros and cons) you need to set the random seed. Note that `workflowr` does this by default. If you are not using that package, then be explicit.  
+```{r set random seed}
+random_seed <- 45678
+set.seed(random_seed)
+addToREADME(c(paste("The random seed is", random_seed), ""))
+```
+
+### Script parameters  
+If the behavior of your script depends on parameters that you set, initialize them early on.  
+```{r simulation parameters}
+nFounders <- 100
+nChr <- 10 # Number of chromosomes
+nSitesPerChr <- 1000 # Number of segregating sites _per chromosome_
+nQTLperChr <- 10 # Vary this parameter to get oligo- versus poly- genic traits
+```
+
+### Parameters to README  
+It's good to have all the information together in the README.  Chunks of code like this do not need to be included in the report.  To exclude them use the "include=FALSE" option in the chunk.  
+```{r parameter to readme, include=FALSE}
+addToREADME(c(
+  paste("The number of founders for the simulation is", nFounders), 
+  paste("The number of chromosomes is", nChr), 
+  paste("There are", nQTLperChr, "QTL per chromosome"),
+  paste("There are", nSitesPerChr, "segregating sites per chromosome"), ""
+  ))
+```
+
+# Simulating some classical results  
+This script uses `AlphaSimR` to simulate the "outbreak of variation" that arises when you self-fertilize a hybrid.  
+
+### AlphaSimR populations  
+The basic object of `AlphaSimR` is the population. To make founders, you first make founder haplotypes from a coalescent simulation, then you define simulation parameters that will link their genetic variation to phenotypic variation, then you make a first diploid population from the founder haplotypes.  
+```{r Make founder population}
+# Create haplotypes for founder population of outbred individuals
+# Note: default effective population size for runMacs is 100
+founderHaps <- AlphaSimR::runMacs(nInd=nFounders, nChr=nChr, segSites=nSitesPerChr)
+
+# New global simulation parameters from founder haplotypes
+SP <- AlphaSimR::SimParam$new(founderHaps)
+# Additive trait architecture
+# By default, the genetic variance will be 1
+SP$addTraitA(nQtlPerChr=nQTLperChr)
+
+# Create a new population of founders
+founders <- AlphaSimR::newPop(founderHaps, simParam=SP)
+str(founders)
+```
+
+### Population information  
+The population has `id`s. The `@mother` and `@father` ids are all zero because this population was made from founder haplotypes, and so does not have diploid parents. The genotypic values `gv` of the population are calculated for the trait created using `SP$addTraitA(nQtlPerChr=nQTLperChr)`. Given that there are `r nChr` chromosome`r ifelse(nChr > 1, "s", "")` and `r nQTLperChr` QTL per chromosome, there are `3^(nChr*nQTLperChr)` = `r 3^(nChr*nQTLperChr)` different possible genotypic values. These genotypic values are accessible with the function `gv(founders)`
+
+From here, you can treat this population like a named vector using the square braces extraction operator `[ ]`.  Extract individuals by their `@id` or just by their order in the population using an integer index. For example, pick three random individuals from a population and list their ids. Pick the one with the first id in alphabetical order.  
+```{r Population extraction operator}
+test <- founders[sample(nFounders, 3)]
+testID <- test@id
+firstInd <- test[order(testID)[1]]
+print(testID)
+print(firstInd)
+print(firstInd@id)
+```
+
+### Outbreak of variation  
+Emerson and East (1913) showed that if you crossed to inbreds, the hybrid had similar variation to each inbred, but if you then selfed the hybrid, the offspring varied substantially. This code simulates that result. First, self the founders to homozygosity. The function `self` self-fertilizes individuals from the population. By default, it creates one selfed individual per parent (controllable with the parameter `nProgeny`), so this works nicely for single-seed descent.  
+```{r self founders}
+# Self-pollinate to for a few generations
+nGenSelf <- 3
+inbredPop <- founders
+for (gen in 1:nGenSelf){
+  inbredPop <- AlphaSimR::self(inbredPop)
+}
+```
+
+### Check homozygosity  
+Just a sanity check that this has, in fact, created a population of 100 individuals that are appropriately homozygous.  Loci are coded 0, 1, 2. So `qtl == 1` represents the case were a locus is heterozygous. `sum(qtl == 1)` counts those cases.  
+```{r Check homozygosity}
+qtl <- AlphaSimR::pullQtlGeno(inbredPop)
+if (nrow(qtl) != nFounders) stop("The number of individuals is unexpected")
+if (ncol(qtl) != nChr * nQTLperChr) stop("The number of QTL is unexpected")
+fracHet <- sum(qtl == 1) / (nFounders * nChr * nQTLperChr)
+cat("Expected fraction heterozygous", 1 / 2^nGenSelf, "\n",
+    "Observed fraction heterozygous", fracHet, "+/-", 
+    round(2*sqrt(fracHet*(1-fracHet)/(nFounders*nChr*nQTLperChr)), 3), "\n")
+```
+
+> What was wrong with my reasoning about the Expected fraction heterozygous?
+
+### Simulate outbreak of variation  
+We will pick the pair of most average or most extreme inbred individuals, in terms of their genetic value, cross those pairs, then self-fertilize them to test their variation. We will assume a trait that has a heritability of 0.5 in the base, non-inbred population population. In `AlphaSimR`, that means genetic and error variances of 1. Find the average pair by ordering and picking two in the middle. Find the extreme pair by picking the first and last.  
+```{r Pick average or extreme pairs}
+indGVs <- AlphaSimR::gv(inbredPop)
+averageInd <- inbredPop[order(indGVs)[50:51]]
+extremeInd <- inbredPop[order(indGVs)[c(1, nFounders)]]
+```
+
+### Cross the pair to make F1 hybrid  
+The crossPlan is a **two-column matrix** with as many rows as the number of crosses you want to make, the first column is the `@id` or the index of the seed parent, and likewise for the pollen parent in the second column.  To make an F1, you just want to make one cross, so the matrix is one row. You just want to cross individual 1 with individual 2, so the row contains 1:2.  
+```{r Make hybrids}
+crossPlan <- matrix(1:2, nrow=1, ncol=2)
+f1_average <- AlphaSimR::makeCross(averageInd, crossPlan)
+f1_extreme <- AlphaSimR::makeCross(extremeInd, crossPlan)
+```
+
+### Make F2 and observe phenotypic variance  
+When you first make a population, `AlphaSimR` does not assume it has been phenotyped. You can phenotype it using the `setPheno` function.  Note that if you use `setPheno` on the same population a second time, that will overwrite the phenotypes from the first time. The genotypic variance can be retrieved using the function `varG`. Really, `varG` gives all we need to know, but of course that variance is generally not observable in non-simulated reality.  
+```{r Make F2}
+f2_average <- AlphaSimR::self(f1_average, nProgeny=100)
+f2_average <- AlphaSimR::setPheno(f2_average, varE=1)
+cat("Genotypic variance of F2 between average pair", round(AlphaSimR::varG(f2_average), 3))
+hist(AlphaSimR::pheno(f2_average), main="Histogram of Average-Pair F2 Phenotypes")
+f2_extreme <- AlphaSimR::self(f1_extreme, nProgeny=100)
+f2_extreme <- AlphaSimR::setPheno(f2_extreme, varE=1)
+cat("Genotypic variance of F2 between extreme pair", round(AlphaSimR::varG(f2_extreme), 3))
+hist(AlphaSimR::pheno(f2_extreme), main="Histogram of Extreme-Pair F2 Phenotypes")
+```
+
+### Observe F1 phenotypic variance  
+We only made a single F1 plant.  `AlphaSimR` can't give that plant different phenotypes. So to pretend to be Emerson and East, we have to make, say, 100 F1 individuals. Do this just for the f1_extreme case. Here, `varG` may or may not be zero, depending on how many generations of selfing you did. Now the `crossPlan` has many rows indicating the same cross.  
+```{r Make many hybrids}
+crossPlan <- matrix(1:2, nrow=100, ncol=2, byrow=T)
+f1_extremeMany <- AlphaSimR::makeCross(extremeInd, crossPlan)
+f1_extremeMany <- AlphaSimR::setPheno(f1_extremeMany, varE=1)
+cat("Genotypic variance of F1 between extreme pair", round(AlphaSimR::varG(f1_extremeMany), 3))
+hist(AlphaSimR::pheno(f1_extremeMany), main="Histogram of Extreme-Pair *F1* Phenotypes")
+```
+
+> What conditions will tend to make the outbreak of variation under the "average" scenario similar to the "extreme" scenario?
+
+### Illustrate `here` by writing a file  
+Just to practice again using the here package because it makes life easy.
+```{r write QTL with here}
+utils::write.csv(qtl, here::here("output", "QTLgenotypes.csv"))
+```
+
+# Homework
+Illustrate regression to the mean between parents and offspring using AlphaSimR  
+1. You know how to create a population -- create a population of parents  
+2. You know how to get phenotypes from that population  
+3. Assume you want to randomly mate that population to get progeny that will be regressed to the mean.  The command for that is `AlphaSimR::randCross`.  Check out its documentation  
+4. Having made the progeny population, phenotype it also  
+5. Make a scatterplot of the progeny phenotypes against the parent mean phenotypes  
+  i) This is actually tricky: you are going to have to find the pedigree of the progeny using the `@mother` and `@father` ids of the progeny population and match those up to the parent population  
+  ii) Having done that, run the regression of progeny on parent mean  
+  iii) What is the regression coefficient?  

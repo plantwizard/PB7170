@@ -2,7 +2,7 @@ name: "PB7170"
 output_dir: ../docs
 navbar:
   title: "PB7170"
-  left:
+left:
   - text: Home
     href: index.html
   - text: About

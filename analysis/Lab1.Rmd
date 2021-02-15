@@ -17,3 +17,24 @@ s=rnorm(1000,15,10)
 hist(s)
 ```
 
+Working with vectors
+```{r vectors}
+b=rep(1,1000)
+sumS <- t(s) %*%b
+meanS <- sumS/length(s)
+print(meanS)
+
+```
+
+##Variance
+```{r variance}
+sc = s-meanS[1] #centering the values
+sumSQ= 0.0
+
+for(i in c(1,1000)){
+  sumSQ= sumSQ +sc[i]**2
+}
+
+varS=sumSQ/(length(sc)-1)
+```
+
