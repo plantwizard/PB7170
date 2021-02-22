@@ -498,16 +498,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong0b0f372"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 0b0f372 </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong124bcdf"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 124bcdf </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrong0b0f372" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrong124bcdf" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version 0b0f372. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version 124bcdf. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -559,6 +559,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+124bcdf
+</td>
+<td>
+plantwizard
+</td>
+<td>
+2021-02-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -703,7 +720,7 @@ str(founders)</code></pre>
   ..@ father : chr [1:100] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
   ..@ sex    : chr [1:100] &quot;H&quot; &quot;H&quot; &quot;H&quot; &quot;H&quot; ...
   ..@ nTraits: int 1
-  ..@ gv     : num [1:100, 1] 0.135 0.32 0.608 0.227 0.711 ...
+  ..@ gv     : num [1:100, 1] 0.0946 -0.4174 -2.3407 -0.8747 -1.8342 ...
   ..@ pheno  : num [1:100, 1] NA NA NA NA NA NA NA NA NA NA ...
   ..@ ebv    : num[1:100, 0 ] 
   ..@ gxe    :List of 1
@@ -816,16 +833,16 @@ str(founders)</code></pre>
   ..@ ploidy : int 2
   ..@ nLoci  : int [1:10] 1000 1000 1000 1000 1000 1000 1000 1000 1000 1000
   ..@ geno   :List of 10
-  .. ..$ : raw [1:125, 1:2, 1:100] 48 a8 04 a1 ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 20 81 61 25 ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 85 01 a4 26 ...
-  .. ..$ : raw [1:125, 1:2, 1:100] d8 2e a1 20 ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 86 e2 a8 01 ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 4c 20 2f fd ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 97 8f 2c 8a ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 44 6b 10 9a ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 83 c9 0e c2 ...
-  .. ..$ : raw [1:125, 1:2, 1:100] 74 b0 a4 61 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 88 47 6c 01 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 9a 5b 22 1b ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 44 07 02 4e ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 01 45 70 90 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 3f a1 41 66 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] ee 1f 15 21 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 08 09 e2 5e ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 0c 18 81 17 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 48 40 3d 02 ...
+  .. ..$ : raw [1:125, 1:2, 1:100] 46 18 08 32 ...
   .. ..- attr(*, &quot;dim&quot;)= int [1:2] 10 1</code></pre>
 </div>
 <div id="population-information" class="section level3">
@@ -836,7 +853,7 @@ str(founders)</code></pre>
 testID &lt;- test@id
 firstInd &lt;- test[order(testID)[1]]
 print(testID)</code></pre>
-<pre><code>[1] &quot;84&quot; &quot;16&quot; &quot;36&quot;</code></pre>
+<pre><code>[1] &quot;76&quot; &quot;84&quot; &quot;16&quot;</code></pre>
 <pre class="r"><code>print(firstInd)</code></pre>
 <pre><code>An object of class &quot;Pop&quot; 
 Ploidy: 2 
@@ -868,7 +885,7 @@ cat(&quot;Expected fraction heterozygous&quot;, 1 / 2^nGenSelf, &quot;\n&quot;,
     &quot;Observed fraction heterozygous&quot;, fracHet, &quot;+/-&quot;, 
     round(2*sqrt(fracHet*(1-fracHet)/(nFounders*nChr*nQTLperChr)), 3), &quot;\n&quot;)</code></pre>
 <pre><code>Expected fraction heterozygous 0.125 
- Observed fraction heterozygous 0.0326 +/- 0.004 </code></pre>
+ Observed fraction heterozygous 0.0292 +/- 0.003 </code></pre>
 <blockquote>
 <p>What was wrong with my reasoning about the Expected fraction heterozygous?</p>
 </blockquote>
@@ -893,13 +910,13 @@ f1_extreme &lt;- AlphaSimR::makeCross(extremeInd, crossPlan)</code></pre>
 <pre class="r"><code>f2_average &lt;- AlphaSimR::self(f1_average, nProgeny=100)
 f2_average &lt;- AlphaSimR::setPheno(f2_average, varE=1)
 cat(&quot;Genotypic variance of F2 between average pair&quot;, round(AlphaSimR::varG(f2_average), 3))</code></pre>
-<pre><code>Genotypic variance of F2 between average pair 0.725</code></pre>
+<pre><code>Genotypic variance of F2 between average pair 0.455</code></pre>
 <pre class="r"><code>hist(AlphaSimR::pheno(f2_average), main=&quot;Histogram of Average-Pair F2 Phenotypes&quot;)</code></pre>
 <p><img src="figure/Lab2_ProgrammingAlphaSimR.Rmd/Make%20F2-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>f2_extreme &lt;- AlphaSimR::self(f1_extreme, nProgeny=100)
 f2_extreme &lt;- AlphaSimR::setPheno(f2_extreme, varE=1)
 cat(&quot;Genotypic variance of F2 between extreme pair&quot;, round(AlphaSimR::varG(f2_extreme), 3))</code></pre>
-<pre><code>Genotypic variance of F2 between extreme pair 1.165</code></pre>
+<pre><code>Genotypic variance of F2 between extreme pair 1.157</code></pre>
 <pre class="r"><code>hist(AlphaSimR::pheno(f2_extreme), main=&quot;Histogram of Extreme-Pair F2 Phenotypes&quot;)</code></pre>
 <p><img src="figure/Lab2_ProgrammingAlphaSimR.Rmd/Make%20F2-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
@@ -910,7 +927,7 @@ cat(&quot;Genotypic variance of F2 between extreme pair&quot;, round(AlphaSimR::
 f1_extremeMany &lt;- AlphaSimR::makeCross(extremeInd, crossPlan)
 f1_extremeMany &lt;- AlphaSimR::setPheno(f1_extremeMany, varE=1)
 cat(&quot;Genotypic variance of F1 between extreme pair&quot;, round(AlphaSimR::varG(f1_extremeMany), 3))</code></pre>
-<pre><code>Genotypic variance of F1 between extreme pair 0.02</code></pre>
+<pre><code>Genotypic variance of F1 between extreme pair 0.032</code></pre>
 <pre class="r"><code>hist(AlphaSimR::pheno(f1_extremeMany), main=&quot;Histogram of Extreme-Pair *F1* Phenotypes&quot;)</code></pre>
 <p><img src="figure/Lab2_ProgrammingAlphaSimR.Rmd/Make%20many%20hybrids-1.png" width="672" style="display: block; margin: auto;" /></p>
 <blockquote>
@@ -958,19 +975,16 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
-[1] workflowr_1.6.2
-
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.5       rstudioapi_0.13  whisker_0.4      knitr_1.30      
- [5] magrittr_2.0.1   hms_0.5.3        here_1.0.1       R6_2.5.0        
- [9] rlang_0.4.8      AlphaSimR_0.13.0 stringr_1.4.0    tools_4.0.3     
-[13] xfun_0.19        git2r_0.28.0     htmltools_0.5.0  ellipsis_0.3.1  
-[17] rprojroot_2.0.2  yaml_2.2.1       digest_0.6.27    tibble_3.0.4    
-[21] lifecycle_0.2.0  crayon_1.3.4     readr_1.4.0      later_1.1.0.1   
-[25] vctrs_0.3.5      promises_1.1.1   fs_1.5.0         glue_1.4.2      
-[29] evaluate_0.14    rmarkdown_2.6    stringi_1.5.3    compiler_4.0.3  
-[33] pillar_1.4.7     httpuv_1.5.4     pkgconfig_2.0.3 </code></pre>
+ [5] magrittr_2.0.1   workflowr_1.6.2  hms_0.5.3        here_1.0.1      
+ [9] R6_2.5.0         rlang_0.4.8      AlphaSimR_0.13.0 stringr_1.4.0   
+[13] tools_4.0.3      xfun_0.19        git2r_0.28.0     htmltools_0.5.0 
+[17] ellipsis_0.3.1   yaml_2.2.1       digest_0.6.27    rprojroot_2.0.2 
+[21] tibble_3.0.4     lifecycle_0.2.0  crayon_1.3.4     readr_1.4.0     
+[25] later_1.1.0.1    vctrs_0.3.5      promises_1.1.1   fs_1.5.0        
+[29] glue_1.4.2       evaluate_0.14    rmarkdown_2.6    stringi_1.5.3   
+[33] compiler_4.0.3   pillar_1.4.7     httpuv_1.5.4     pkgconfig_2.0.3 </code></pre>
 </div>
 </div>
 

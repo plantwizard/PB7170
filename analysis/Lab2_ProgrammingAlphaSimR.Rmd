@@ -232,3 +232,16 @@ Illustrate regression to the mean between parents and offspring using AlphaSimR
   i) This is actually tricky: you are going to have to find the pedigree of the progeny using the `@mother` and `@father` ids of the progeny population and match those up to the parent population  
   ii) Having done that, run the regression of progeny on parent mean  
   iii) What is the regression coefficient?  
+ 
+ ### Get Phenotypes 
+ And get pedigrees
+```{r Get phenotypes}
+parentPheno <- AlphaSimR::setPheno(founders, varE = 1, onlyPheno = T)
+
+```
+  ###Make random crosses
+```{r Random crosses}
+progenyPop <- AlphaSimR::randCross(founders, nCrosses = 200)
+pedigree <- cbind(progenyPop@mother, progenyPop@father)
+```
+  
